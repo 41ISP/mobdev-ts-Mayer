@@ -1,11 +1,14 @@
 import { FormEvent, useState } from 'react';
 import {nanoid} from "nanoid"
+import { useExpensesStore } from '../store/expensesStore';
+import { CATEGORIES, CATEGORY_KEYS } from '../constants';
+import { TCategory } from '../types';
 
 export default function ExpenseForm() {
   const [title, setTitle] = useState<string>('');
   const [amount, setAmount] = useState<string>('');
-
-
+  const {addExpense} = useExpensesStore()
+  const [category, setCategory] = useState()
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -14,9 +17,12 @@ export default function ExpenseForm() {
     const newExpense = {
       id: nanoid(),
       title: title,
-      amount: Number(amount)
+      amount: Number(amount),
+      category: category
     }
-
+    addExpense(newExpense)
+    setTitle("")
+    setAmount("")
   }
 
   return (
@@ -38,6 +44,16 @@ export default function ExpenseForm() {
           required
           onChange={(e) => setAmount(e.target.value)}
         />
+        <select 
+        value={category}
+        onChange={(e) => setCategory(e.target.value as TCategory)}
+        >
+          {CATEGORY_KEYS.map((el, i)=>(
+            <option value={el} key={i}>
+              {CATEGORIES[el].emoji} {CATEGORIES[el].label}
+            </option>
+          ))}
+        </select>
       </div>
       <button type="submit" className="btn">
         Добавить
